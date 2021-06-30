@@ -7,7 +7,7 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
+#include <windows.h>
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
@@ -170,6 +170,8 @@ BEGIN
         MENUITEM "保存",                        ID_FILE_SAVE
         MENUITEM "保存为",                      ID_FILE_SAVE_AS
         MENUITEM "退出",                        ID_FILE_EXIT
+        MENUITEM SEPARATOR
+        MENUITEM "(当前未打开文件)",            ID_FILE_NAME_DISP, GRAYED
     END
     POPUP "编辑"
     BEGIN
@@ -247,10 +249,11 @@ IDB_CEMENT              BITMAP  DISCARDABLE     "cement.bmp"
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_ICON_CEMENT         ICON    DISCARDABLE     "icon1.ico"
+MAINICON                ICON    DISCARDABLE     "icon1.ico"
 #endif    // Chinese (P.R.C.) resources
 /////////////////////////////////////////////////////////////////////////////
 
-MAINICON ICON "icon1.ico"
+
 
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////

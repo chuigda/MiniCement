@@ -39,12 +39,13 @@
 #define IDC_ONLINE_INUSE_LIST           1021
 #define IDC_ABOUT_DIALOG_BITMAP         1021
 #define ID_PKG_ONLINE                   40001
-#define ID_FILE_NEW_                    40003
-#define ID_FILE_OPEN_                   40004
-#define ID_FILE_SAVE_                   40005
-#define ID_FILE_SAVE_AS_                40006
-#define ID_EDIT_UNDO_                   40007
-#define ID_EDIT_REDO_                   40008
+#define ID_FILE_NEW                     40003
+#define ID_FILE_OPEN                    40004
+#define ID_FILE_SAVE                    40005
+#define ID_FILE_SAVE_AS                 40006
+#define ID_EDIT_UNDO                    40007
+#define ID_EDIT_REDO                    40008
+#define ID_FILE_NAME_DISP               40010
 #define IDC_ONINE_AVAIL                 -1
 #define IDC_ABOUT_DIALOG_STATIC         -1
 
@@ -53,7 +54,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        107
-#define _APS_NEXT_COMMAND_VALUE         40009
+#define _APS_NEXT_COMMAND_VALUE         40011
 #define _APS_NEXT_CONTROL_VALUE         1022
 #define _APS_NEXT_SYMED_VALUE           120
 #endif

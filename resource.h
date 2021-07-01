@@ -1,7 +1,4 @@
-//{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
-// Used by Main.rc
-//
+
 #define IDR_MAIN_MENU                   101
 #define IDD_PACK_DIALOG                 101
 #define IDD_ONLINE_PKGS_DIALOG          102

@@ -1,8 +1,10 @@
 #include <windows.h>
 #include <stdio.h>
 
+#include "CodeEdit.h"
 #include "Codegen.h"
 #include "Error.h"
+#include "GlobalContext.h"
 #include "X86.h"
 #include "Util.h"
 
@@ -12,19 +14,34 @@ static const LPCSTR WarnText =
 "注意：本程序是工程样品！\r\n"
 "本程序的功能可能不稳定，请谨慎使用\r\n";
 
-typedef struct st_main_window_data {
+static const LPCSTR MainWindowClassName = "MainWindowClassName_79431242";
+
+typedef struct st_main_window_init {
+    GlobalContext globalContext;
+    HFONT hFont;
+} MainWindowInit;
+
+typedef MainWindowInit* LPMWINIT;
+typedef MainWindowInit const* LPCMWINIT;
+
+typedef struct st_main_window_data {    
+    /* handles to children widgets */
+    HWND hWndEdit;
+    HWND hWndStatus;
+
+    /* context data */
     LPSTR lpszEditFileName;
+
+    /* global context */
+    GlobalContext globalContext;
+
+    /* cached stuff */
+    CHAR szFileNameBuffer[4096];
+    OPENFILENAME openFileName;
 } MainWindowData;
 
 typedef MainWindowData* LPMWDATA;
 typedef MainWindowData const* LPCMWDATA;
-
-static WNDPROC EditControlWndProc = NULL;
-static HINSTANCE GlobalInstance;
-
-static CHAR FileNameBuffer[4096];
-static OPENFILENAME OpenFileName;
-static MENUITEMINFO FileNameDispSetter;
 
 LRESULT CALLBACK MainWindowProc(HWND hWnd,
                                 UINT msg,
@@ -41,10 +58,14 @@ int main(int argc, const char *argv[]) {
 
     HWND hWnd;
     MSG msg;
+    WNDCLASS wndClass;
+
     HFONT hFont;
     HICON hIcon;
     HMENU hMenu;
-    LPMWDATA lpMainWindowData;
+    MainWindowInit mainWindowInit;
+
+    GlobalContext globalContext;
 
     for (n = 1; n < argc;  n++) {
         if (!strcmp(argv[n], "/Hl")) {
@@ -59,13 +80,14 @@ int main(int argc, const char *argv[]) {
         fprintf(stderr, "%s\r\n", WarnText);
     }
 
-    GlobalInstance = GetModuleHandle(NULL);
-    if (!GlobalInstance) {
+    globalContext.hInstance = GetModuleHandle(NULL);
+    globalContext.hHeap = GetProcessHeap();
+    if (!globalContext.hInstance) {
         MessageBox(NULL, "无法获取应用程序实例", "错误", MB_ICONSTOP);
         return -1;
     }
 
-    hMenu = LoadMenu(GlobalInstance, MAKEINTRESOURCE(IDR_MAIN_MENU));
+    hMenu = LoadMenu(globalContext.hInstance, MAKEINTRESOURCE(IDR_MAIN_MENU));
     if (!hMenu) {
         MessageBox(NULL, "无法初始化程序菜单", "错误", MB_ICONSTOP);
         return -1;
@@ -81,40 +103,37 @@ int main(int argc, const char *argv[]) {
         return -1;
     }
 
-    hIcon = LoadIcon(GlobalInstance, MAKEINTRESOURCE(IDI_ICON_CEMENT));
+    hIcon = LoadIcon(globalContext.hInstance, MAKEINTRESOURCE(IDI_ICON_CEMENT));
     if (!hIcon) {
         MessageBox(NULL, "无法初始化程序图标资源", "错误", MB_ICONSTOP);
         return -1;
     }
 
-    lpMainWindowData = (LPMWDATA)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(MainWindowData));
+    wndClass.style = 0;
+    wndClass.lpfnWndProc = MainWindowProc;
+    wndClass.cbClsExtra = 0;
+    wndClass.cbWndExtra = 0;
+    wndClass.hInstance = globalContext.hInstance;
+    wndClass.hIcon = hIcon;
+    wndClass.hCursor = LoadCursor(globalContext.hInstance, IDC_ARROW);
+    wndClass.hbrBackground = (HBRUSH)COLOR_WINDOW;
+    wndClass.lpszMenuName = MAKEINTRESOURCE(IDR_MAIN_MENU);
+    wndClass.lpszClassName = MainWindowClassName;
+    if (!RegisterClass(&wndClass)) {
+        MessageBox(NULL, "注册窗口类失败", "错误", MB_ICONSTOP);
+        return -1;
+    }
 
-    hWnd = CreateWindow("edit", "Mini Cement IDE",
-                        ES_AUTOVSCROLL | ES_MULTILINE | WS_OVERLAPPEDWINDOW | WS_BORDER,
+    mainWindowInit.hFont = hFont;
+    mainWindowInit.globalContext = globalContext;
+    hWnd = CreateWindow(MainWindowClassName, "Mini Cement IDE",
+                        WS_OVERLAPPEDWINDOW | WS_BORDER,
                         CW_USEDEFAULT, CW_USEDEFAULT, 640, 480,
-                        NULL, hMenu, GlobalInstance, NULL);
+                        NULL, hMenu, globalContext.hInstance, &mainWindowInit);
     if (!hWnd) {
         MessageBox(NULL, "无法初始化程序窗口", "错误", MB_ICONSTOP);
         return -1;
     }
-
-    OpenFileName.lStructSize = sizeof(OPENFILENAME);
-    OpenFileName.hwndOwner = hWnd;
-    OpenFileName.lpstrFile = FileNameBuffer;
-    OpenFileName.nMaxFile = 4095;
-    OpenFileName.lpstrFilter = "*.CEM;*.CEMENT";
-
-    FileNameDispSetter.cbSize = sizeof(MENUITEMINFO);
-    FileNameDispSetter.fMask = MIIM_TYPE;
-    FileNameDispSetter.fType = MFT_STRING;
-
-    EditControlWndProc = (WNDPROC)GetWindowLong(hWnd, GWL_WNDPROC);
-    SetWindowLong(hWnd, GWL_WNDPROC, (LONG)MainWindowProc);
-    SetWindowLong(hWnd, GWL_USERDATA, (LONG)lpMainWindowData);
-    SetWindowText(hWnd, "");
-    SendMessage(hWnd, WM_SETFONT, (WPARAM)hFont, (LPARAM)TRUE);
-    SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
-    SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 
     ShowWindow(hWnd, SW_SHOW);
     
@@ -129,29 +148,65 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd,
                                 UINT msg,
                                 WPARAM wParam,
                                 LPARAM lParam) {
-    HMENU hMenu = (HMENU)GetMenu(hWnd);
     LPMWDATA lpMainWindowData = (LPMWDATA)GetWindowLong(hWnd, GWL_USERDATA);
 
     switch (msg) {
+    case WM_CREATE: {
+        LPCREATESTRUCTA lpCreateStruct;
+        LPCMWINIT lpMainWindowInit;
+        RECT rect;
+
+        lpCreateStruct = (LPCREATESTRUCT)lParam;
+        lpMainWindowInit = (LPMWINIT)lpCreateStruct->lpCreateParams;
+
+        lpMainWindowData = (LPMWDATA)HeapAlloc(lpMainWindowInit->globalContext.hHeap, HEAP_ZERO_MEMORY, sizeof(MainWindowData));
+        if (!lpMainWindowData) {
+            MessageBox(NULL, "无法初始化程序窗口", "错误", MB_ICONSTOP);
+            PostQuitMessage(-1);
+            break;
+        }
+
+        lpMainWindowData->globalContext = lpMainWindowInit->globalContext;
+
+        lpMainWindowData->openFileName.lStructSize = sizeof(OPENFILENAME);
+        lpMainWindowData->openFileName.hwndOwner = hWnd;
+        lpMainWindowData->openFileName.lpstrFile = lpMainWindowData->szFileNameBuffer;
+        lpMainWindowData->openFileName.nMaxFile = 4095;
+        lpMainWindowData->openFileName.lpstrFilter = "*.CEM;*.CEMENT";
+
+        GetClientRect(hWnd, &rect);
+        lpMainWindowData->hWndEdit = CreateCodeEditControl(hWnd, 0, 0, rect.right, rect.bottom);
+        if (!lpMainWindowData->hWndEdit) {
+            MessageBox(NULL, "无法初始化程序窗口", "错误", MB_ICONSTOP);
+            PostQuitMessage(-1);
+            break;
+        }
+
+        SendMessage(lpMainWindowData->hWndEdit, WM_SETFONT, (WPARAM)lpMainWindowInit->hFont, (LPARAM)TRUE);
+        SetWindowLong(hWnd, GWL_USERDATA, (LONG)lpMainWindowData);
+        return DefWindowProc(hWnd, msg, wParam, lParam);
+    }
+    case WM_SIZE: {
+        MoveWindow(lpMainWindowData->hWndEdit, 0, 0, LOWORD(lParam), HIWORD(lParam), TRUE);
+        break;
+    }
     case WM_COMMAND:
         switch (LOWORD(wParam)) {
         case ID_FILE_NEW: {
             BOOL bModified;
             INT iChoice;
 
-            bModified = (BOOL)SendMessage(hWnd, EM_GETMODIFY, 0, 0);
+            bModified = (BOOL)SendMessage(lpMainWindowData->hWndEdit, EM_GETMODIFY, 0, 0);
             if (bModified) {
                 iChoice = MessageBox(hWnd, "有未保存的改动，确定继续吗", "警告", MB_OKCANCEL | MB_ICONWARNING);
             }
 
             if (!bModified || iChoice == IDOK) {
                 if (lpMainWindowData->lpszEditFileName != NULL) {
-                    HeapFree(GetProcessHeap(), 0, lpMainWindowData->lpszEditFileName);
+                    HeapFree(lpMainWindowData->globalContext.hHeap, 0, lpMainWindowData->lpszEditFileName);
                     lpMainWindowData->lpszEditFileName = NULL;
                 }
-                SendMessage(hWnd, WM_SETTEXT, (WPARAM)0, (LPARAM)"");
-                FileNameDispSetter.dwTypeData = (DWORD)"(当前未打开文件)";
-                SetMenuItemInfo(hMenu, ID_FILE_NAME_DISP, FALSE, &FileNameDispSetter);
+                SendMessage(lpMainWindowData->hWndEdit, WM_SETTEXT, (WPARAM)0, (LPARAM)"");
             }
             break;
         }
@@ -161,33 +216,31 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd,
             BOOL bSuccess;
             LPSTR lpszFileContent;
 
-            OpenFileName.Flags = OFN_FILEMUSTEXIST | OFN_ENABLESIZING;
+            lpMainWindowData->openFileName.Flags = OFN_FILEMUSTEXIST | OFN_ENABLESIZING;
 
-            bModified = (BOOL)SendMessage(hWnd, EM_GETMODIFY, 0, 0);
+            bModified = (BOOL)SendMessage(lpMainWindowData->hWndEdit, EM_GETMODIFY, 0, 0);
             if (bModified) {
                 iChoice = MessageBox(hWnd, "有未保存的改动，确定继续吗", "警告", MB_OKCANCEL | MB_ICONWARNING);
             }
 
             if (!bModified || iChoice == IDOK) {
-                bSuccess = GetOpenFileName(&OpenFileName);
+                bSuccess = GetOpenFileName(&lpMainWindowData->openFileName);
                 if (!bSuccess) {
                     break;
                 }
 
-                bSuccess = ReadFileToString(OpenFileName.lpstrFile, &lpszFileContent);
+                bSuccess = ReadFileToString(lpMainWindowData->openFileName.lpstrFile, &lpszFileContent);
                 if (!bSuccess) {
                     MessageBox(hWnd, "无法打开指定的文件", "错误", MB_ICONSTOP);
                     break;
                 }
 
                 if (lpMainWindowData->lpszEditFileName != NULL) {
-                    HeapFree(GetProcessHeap(), 0, lpMainWindowData->lpszEditFileName);
+                    HeapFree(lpMainWindowData->globalContext.hHeap, 0, lpMainWindowData->lpszEditFileName);
                 }
-                lpMainWindowData->lpszEditFileName = StringCopy(OpenFileName.lpstrFile);
-                FileNameDispSetter.dwTypeData = (DWORD)OpenFileName.lpstrFile;
-                SetMenuItemInfo(hMenu, ID_FILE_NAME_DISP, FALSE, &FileNameDispSetter);
-                SendMessage(hWnd, WM_SETTEXT, (WPARAM)0, (LPARAM)lpszFileContent);
-                HeapFree(GetProcessHeap(), 0, lpszFileContent);
+                lpMainWindowData->lpszEditFileName = StringCopy(lpMainWindowData->openFileName.lpstrFile);
+                SendMessage(lpMainWindowData->hWndEdit, WM_SETTEXT, (WPARAM)0, (LPARAM)lpszFileContent);
+                HeapFree(lpMainWindowData->globalContext.hHeap, 0, lpszFileContent);
             }
             break;
         }
@@ -197,38 +250,38 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd,
             LPSTR lpszBuffer;
             BOOL bCreateFile;
 
-            OpenFileName.Flags = OFN_CREATEPROMPT | OFN_ENABLESIZING;
+            lpMainWindowData->openFileName.Flags = OFN_CREATEPROMPT | OFN_ENABLESIZING;
 
-            iTextLength = GetWindowTextLength(hWnd);
-            lpszBuffer = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, iTextLength + 1);
+            iTextLength = GetWindowTextLength(lpMainWindowData->hWndEdit);
+            lpszBuffer = HeapAlloc(lpMainWindowData->globalContext.hHeap, HEAP_ZERO_MEMORY, iTextLength + 1);
             if (!lpszBuffer) {
                 MessageBox(hWnd, "无法保存文件", "错误", MB_ICONSTOP);
                 break;
             }
-            GetWindowText(hWnd, lpszBuffer, iTextLength);
+            GetWindowText(lpMainWindowData->hWndEdit, lpszBuffer, iTextLength + 1);
 
             if (lpMainWindowData->lpszEditFileName == NULL) {
                 bCreateFile = TRUE;
-                bSuccess = GetSaveFileName(&OpenFileName);
+                bSuccess = GetSaveFileName(&lpMainWindowData->openFileName);
                 if (!bSuccess) {
                     break;
                 }
-                lpMainWindowData->lpszEditFileName = StringCopy(OpenFileName.lpstrFile);
+                lpMainWindowData->lpszEditFileName = StringCopy(lpMainWindowData->openFileName.lpstrFile);
+            } else {
+                bCreateFile = FALSE;
             }
 
             bSuccess = WriteStringToFile(lpMainWindowData->lpszEditFileName, lpszBuffer);
             if (!bSuccess) {
                 MessageBox(hWnd, "无法保存到指定的文件", "错误", MB_ICONSTOP);
                 if (bCreateFile) {
-                    HeapFree(GetProcessHeap(), 0, lpMainWindowData->lpszEditFileName);
+                    HeapFree(lpMainWindowData->globalContext.hHeap, 0, lpMainWindowData->lpszEditFileName);
                     lpMainWindowData->lpszEditFileName = NULL;
                 }
             } else {
-                FileNameDispSetter.dwTypeData = (DWORD)lpMainWindowData->lpszEditFileName;
-                SetMenuItemInfo(hMenu, ID_FILE_NAME_DISP, FALSE, &FileNameDispSetter);
-                SendMessage(hWnd, EM_SETMODIFY, (WPARAM)FALSE, (LPARAM)0);
+                SendMessage(lpMainWindowData->hWndEdit, EM_SETMODIFY, (WPARAM)FALSE, (LPARAM)0);
             }
-            HeapFree(GetProcessHeap(), 0, lpszBuffer);
+            HeapFree(lpMainWindowData->globalContext.hHeap, 0, lpszBuffer);
             break;
         }
         case ID_FILE_SAVE_AS: {
@@ -237,35 +290,33 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd,
             LPSTR lpszFileName;
             LPSTR lpszBuffer;
 
-            OpenFileName.Flags = OFN_CREATEPROMPT | OFN_ENABLESIZING;
-            iTextLength = GetWindowTextLength(hWnd);
-            lpszBuffer = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, iTextLength + 1);
+            lpMainWindowData->openFileName.Flags = OFN_CREATEPROMPT | OFN_ENABLESIZING;
+            iTextLength = GetWindowTextLength(lpMainWindowData->hWndEdit);
+            lpszBuffer = HeapAlloc(lpMainWindowData->globalContext.hHeap, HEAP_ZERO_MEMORY, iTextLength + 1);
             if (!lpszBuffer) {
                 MessageBox(hWnd, "无法保存文件", "错误", MB_ICONSTOP);
                 break;
             }
-            GetWindowText(hWnd, lpszBuffer, iTextLength);
+            GetWindowText(lpMainWindowData->hWndEdit, lpszBuffer, iTextLength + 1);
 
-            bSuccess = GetSaveFileName(&OpenFileName);
+            bSuccess = GetSaveFileName(&lpMainWindowData->openFileName);
             if (!bSuccess) {
                 break;
             }
 
-            lpszFileName = StringCopy(OpenFileName.lpstrFile);
-            bSuccess = WriteStringToFile(lpMainWindowData->lpszEditFileName, lpszBuffer);
+            lpszFileName = StringCopy(lpMainWindowData->openFileName.lpstrFile);
+            bSuccess = WriteStringToFile(lpszFileName, lpszBuffer);
             if (!bSuccess) {
                 MessageBox(hWnd, "无法保存到指定的文件", "错误", MB_ICONSTOP);
-                HeapFree(GetProcessHeap(), 0, lpszFileName);
+                HeapFree(lpMainWindowData->globalContext.hHeap, 0, lpszFileName);
             } else {
                 if (lpMainWindowData->lpszEditFileName != NULL) {
-                    HeapFree(GetProcessHeap(), 0, lpMainWindowData->lpszEditFileName);
+                    HeapFree(lpMainWindowData->globalContext.hHeap, 0, lpMainWindowData->lpszEditFileName);
                 }
-                FileNameDispSetter.dwTypeData = (DWORD)lpszFileName;
-                SetMenuItemInfo(hMenu, ID_FILE_NAME_DISP, FALSE, &FileNameDispSetter);
                 lpMainWindowData->lpszEditFileName = lpszFileName;
-                SendMessage(hWnd, EM_SETMODIFY, (WPARAM)FALSE, (LPARAM)0);
+                SendMessage(lpMainWindowData->hWndEdit, EM_SETMODIFY, (WPARAM)FALSE, (LPARAM)0);
             }
-            HeapFree(GetProcessHeap(), 0, lpszBuffer);
+            HeapFree(lpMainWindowData->globalContext.hHeap, 0, lpszBuffer);
             break;
         }
         case ID_FILE_EXIT:
@@ -274,7 +325,8 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd,
         case ID_PROG_INTERP:
             break;
         case ID_HELP_ABOUT:
-            DialogBox(GlobalInstance, MAKEINTRESOURCE(IDD_ABOUT_DIALOG), hWnd, AboutDlgProc);
+            DialogBox(lpMainWindowData->globalContext.hInstance,
+                      MAKEINTRESOURCE(IDD_ABOUT_DIALOG), hWnd, AboutDlgProc);
             break;
         }
         break;
@@ -282,7 +334,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd,
         BOOL bModified;
         INT iChoice;
 
-        bModified = (BOOL)SendMessage(hWnd, EM_GETMODIFY, 0, 0);
+        bModified = (BOOL)SendMessage(lpMainWindowData->hWndEdit, EM_GETMODIFY, 0, 0);
         if (bModified) {
             iChoice = MessageBox(hWnd, "有未保存的改动，确定继续吗", "警告", MB_OKCANCEL | MB_ICONWARNING);
         }
@@ -295,19 +347,8 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd,
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
-    case WM_CHAR:
-        switch (wParam) {
-        case '\t': {
-            INT i;
-            for (i = 0; i < 2; i++) {
-                SendMessage(hWnd, WM_CHAR, ' ', 0);
-            }
-            return TRUE;
-        }
-        }
-        /* fallthrough */
     default:
-        return EditControlWndProc(hWnd, msg, wParam, lParam);
+        return DefWindowProc(hWnd, msg, wParam, lParam);
     }
     return TRUE;
 }

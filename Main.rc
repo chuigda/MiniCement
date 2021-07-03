@@ -1,4 +1,4 @@
-//Microsoft Developer Studio generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (P.R.C.) resources
+// 中文(简体，中国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
-#ifdef _WIN32
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 #pragma code_page(936)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -27,18 +25,18 @@ LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE DISCARDABLE 
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE DISCARDABLE 
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE DISCARDABLE 
+3 TEXTINCLUDE 
 BEGIN
     "\r\n"
     "\0"
@@ -52,65 +50,51 @@ END
 // Dialog
 //
 
-IDD_PACK_DIALOG DIALOG DISCARDABLE  0, 0, 195, 78
-STYLE DS_3DLOOK | WS_CAPTION | WS_SYSMENU
+IDD_PACK_DIALOG DIALOG 0, 0, 195, 78
+STYLE DS_SETFONT | DS_3DLOOK | WS_CAPTION | WS_SYSMENU
 CAPTION "打包"
 FONT 10, "宋体"
 BEGIN
     GROUPBOX        "打包格式",IDC_PKG_GROUP_FMT,7,7,90,47
-    CONTROL         "动态链接库",IDC_PKG_DLL,"Button",BS_AUTORADIOBUTTON,12,
-                    40,56,10
-    CONTROL         "静态链接库",IDC_PKG_STATIC_LIB,"Button",
-                    BS_AUTORADIOBUTTON,12,29,54,10
-    CONTROL         "水泥包",IDC_PKG_CEMENT_LIB,"Button",BS_AUTORADIOBUTTON,
-                    12,18,48,10
+    CONTROL         "动态链接库",IDC_PKG_DLL,"Button",BS_AUTORADIOBUTTON,12,40,56,10
+    CONTROL         "静态链接库",IDC_PKG_STATIC_LIB,"Button",BS_AUTORADIOBUTTON,12,29,54,10
+    CONTROL         "水泥包",IDC_PKG_CEMENT_LIB,"Button",BS_AUTORADIOBUTTON,12,18,48,10
     GROUPBOX        "代码生成选项",IDC_PKG_CODEGEN,100,7,88,47
-    CONTROL         "兼容80386",IDC_PKG_386,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,105,17,51,10
-    CONTROL         "使用MASM汇编",IDC_PKG_MASM,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,105,28,69,10
-    CONTROL         "使用LINK.EXE链接",IDC_PKG_VCLINK,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,105,39,71,10
+    CONTROL         "兼容80386",IDC_PKG_386,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,105,17,51,10
+    CONTROL         "使用MASM汇编",IDC_PKG_MASM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,105,28,69,10
+    CONTROL         "使用LINK.EXE链接",IDC_PKG_VCLINK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,105,39,71,10
     EDITTEXT        IDC_TEXT_PKG_NAME,7,57,129,14,ES_AUTOHSCROLL
     PUSHBUTTON      "打包",IDC_PKG_PKG,140,57,48,14
 END
 
-IDD_ONLINE_PKGS_DIALOG DIALOG DISCARDABLE  0, 0, 271, 210
-STYLE DS_3DLOOK | WS_CAPTION | WS_SYSMENU
+IDD_ONLINE_PKGS_DIALOG DIALOG 0, 0, 271, 210
+STYLE DS_SETFONT | DS_3DLOOK | WS_CAPTION | WS_SYSMENU
 CAPTION "软件包商城"
 FONT 10, "宋体"
 BEGIN
     GROUPBOX        "可用",IDC_ONINE_AVAIL,7,7,125,160
     GROUPBOX        "已添加",IDC_ONLINE_IN_USE,139,7,125,160
-    CONTROL         "Progress1",IDC_ONLINE_WORK_PROGRESS,"msctls_progress32",
-                    WS_BORDER,7,170,257,16
+    CONTROL         "Progress1",IDC_ONLINE_WORK_PROGRESS,"msctls_progress32",WS_BORDER,7,170,257,16
     PUSHBUTTON      "取消",IDC_ONLINE_CANCEL,105,189,50,14
     PUSHBUTTON      "应用",IDC_ONLINE_APPLY,160,189,50,14
     PUSHBUTTON      "确定",IDC_ONLINE_CONFIRM,214,189,50,14
-    LISTBOX         IDC_ONLINE_AVAIL_LIST,13,33,113,130,LBS_SORT | 
-                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        IDC_ONLINE_AVAIL_SEARCH,13,17,113,30,CBS_DROPDOWN | 
-                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        IDC_ONLINE_INUSE_SEARCH,145,17,113,30,CBS_DROPDOWN | 
-                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    LISTBOX         IDC_ONLINE_INUSE_LIST,145,33,113,130,LBS_SORT | 
-                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_ONLINE_AVAIL_LIST,13,33,113,130,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_ONLINE_AVAIL_SEARCH,13,17,113,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_ONLINE_INUSE_SEARCH,145,17,113,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_ONLINE_INUSE_LIST,145,33,113,130,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
 END
 
-IDD_ABOUT_DIALOG DIALOG DISCARDABLE  0, 0, 218, 110
-STYLE WS_CAPTION | WS_SYSMENU
+IDD_ABOUT_DIALOG DIALOG 0, 0, 218, 110
+STYLE DS_SETFONT | WS_CAPTION | WS_SYSMENU
 CAPTION "关于"
 FONT 10, "宋体"
 BEGIN
     DEFPUSHBUTTON   "确定",IDOK,166,87,45,14
-    LTEXT           "用于 Cement 语言的优化编译器和 IDE\r\n版本 0.1.0-alpha\r\n\r\n本软件由\r\n  - 第七通用设计局\r\n  - 第二空天武器设计局\r\n  - Alex Greenall Software\r\n  - 共产国际先进计算九局\r\n  - ACMC 中央编译局凤凰院\r\n  - 逐梦者第二舰队工程部\r\n联合开发",
-                    IDC_ABOUT_DIALOG_STATIC,7,7,160,94
-    CONTROL         105,IDC_ABOUT_DIALOG_BITMAP,"Static",SS_BITMAP,167,7,44,
-                    44
+    LTEXT           "用于 Cement 语言的优化编译器和 IDE\r\n版本 0.1.0-alpha\r\n\r\n本软件由\r\n  - 第七通用设计局\r\n  - 第二空天武器设计局\r\n  - Alex Greenall Software\r\n  - 共产国际先进计算九局\r\n  - ACMC 中央编译局凤凰院\r\n  - 逐梦者第二舰队工程部\r\n联合开发",IDC_ABOUT_DIALOG_STATIC,7,7,160,94
+    CONTROL         IDB_CEMENT,IDC_ABOUT_DIALOG_BITMAP,"Static",SS_BITMAP,167,7,44,44
 END
 
 
-#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -133,18 +117,18 @@ BEGIN
     BEGIN
         BLOCK "080404b0"
         BEGIN
-            VALUE "Comments", "用于Cement语言的优化编译器和IDE\0"
-            VALUE "CompanyName", "Alex Grenall Software\0"
-            VALUE "FileDescription", "用于Cement语言的优化编译器和IDE\0"
-            VALUE "FileVersion", "0, 1, 0, 0\0"
-            VALUE "InternalName", "MiniCement\0"
-            VALUE "LegalCopyright", "版权所有 Alex Greenall 2021\0"
-            VALUE "LegalTrademarks", "Alex Grenall Software(TM) Cement(R)\0"
-            VALUE "OriginalFilename", "MiniCement.exe\0"
-            VALUE "PrivateBuild", "工程样品\0"
-            VALUE "ProductName", "MiniCement\0"
-            VALUE "ProductVersion", "0, 1, 0, 0\0"
-            VALUE "SpecialBuild", "工程样品\0"
+            VALUE "Comments", "用于Cement语言的优化编译器和IDE"
+            VALUE "CompanyName", "Alex Grenall Software"
+            VALUE "FileDescription", "用于Cement语言的优化编译器和IDE"
+            VALUE "FileVersion", "0, 1, 0, 0"
+            VALUE "InternalName", "MiniCement"
+            VALUE "LegalCopyright", "版权所有 Alex Greenall 2021"
+            VALUE "LegalTrademarks", "Alex Grenall Software(TM) Cement(R)"
+            VALUE "OriginalFilename", "MiniCement.exe"
+            VALUE "PrivateBuild", "工程样品"
+            VALUE "ProductName", "MiniCement"
+            VALUE "ProductVersion", "0, 1, 0, 0"
+            VALUE "SpecialBuild", "工程样品"
         END
     END
     BLOCK "VarFileInfo"
@@ -153,48 +137,44 @@ BEGIN
     END
 END
 
-#endif    // !_MAC
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
 //
 
-IDR_MAIN_MENU MENU DISCARDABLE 
+IDR_MAIN_MENU MENU
 BEGIN
     POPUP "文件"
     BEGIN
-        MENUITEM "新建",                        ID_FILE_NEW
-        MENUITEM "打开",                        ID_FILE_OPEN
-        MENUITEM "保存",                        ID_FILE_SAVE
-        MENUITEM "保存为",                      ID_FILE_SAVE_AS
-        MENUITEM "退出",                        ID_FILE_EXIT
-        MENUITEM SEPARATOR
-        MENUITEM "(当前未打开文件)",            ID_FILE_NAME_DISP, GRAYED
+        MENUITEM "新建",                          ID_FILE_NEW
+        MENUITEM "打开",                          ID_FILE_OPEN
+        MENUITEM "保存",                          ID_FILE_SAVE
+        MENUITEM "保存为",                         ID_FILE_SAVE_AS
+        MENUITEM "退出",                          ID_FILE_EXIT
     END
     POPUP "编辑"
     BEGIN
-        MENUITEM "撤销",                        ID_EDIT_UNDO
-        MENUITEM "重做",                        ID_EDIT_REDO
-        MENUITEM "查找",                        ID_EDIT_SEARCH
+        MENUITEM "撤销",                          ID_EDIT_UNDO
+        MENUITEM "重做",                          ID_EDIT_REDO
+        MENUITEM "查找",                          ID_EDIT_SEARCH
     END
     POPUP "程序"
     BEGIN
-        MENUITEM "运行(解释)",                  ID_PROG_INTERP
-        MENUITEM "运行",                        ID_PROG_RUN
-        MENUITEM "生成",                        ID_PROG_BUILD
-        MENUITEM "检查",                        ID_PROG_CHECK
+        MENUITEM "运行(解释)",                      ID_PROG_INTERP
+        MENUITEM "运行",                          ID_PROG_RUN
+        MENUITEM "生成",                          ID_PROG_BUILD
+        MENUITEM "检查",                          ID_PROG_CHECK
     END
     POPUP "包管理"
     BEGIN
-        MENUITEM "打包",                        ID_PKG_PACK
-        MENUITEM "软件包商城",                  ID_PKG_ONLINE
+        MENUITEM "打包",                          ID_PKG_PACK
+        MENUITEM "软件包商城",                       ID_PKG_ONLINE
     END
     POPUP "帮助"
     BEGIN
-        MENUITEM "帮助主题",                    ID_HELP_HELP
-        MENUITEM "关于",                        ID_HELP_ABOUT
+        MENUITEM "帮助主题",                        ID_HELP_HELP
+        MENUITEM "关于",                          ID_HELP_ABOUT
     END
 END
 
@@ -205,7 +185,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_PACK_DIALOG, DIALOG
     BEGIN
@@ -239,7 +219,8 @@ END
 // Bitmap
 //
 
-IDB_CEMENT              BITMAP  DISCARDABLE     "cement.bmp"
+IDB_CEMENT              BITMAP                  "cement.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -248,9 +229,11 @@ IDB_CEMENT              BITMAP  DISCARDABLE     "cement.bmp"
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_ICON_CEMENT         ICON    DISCARDABLE     "icon1.ico"
-MAINICON                ICON    DISCARDABLE     "icon1.ico"
-#endif    // Chinese (P.R.C.) resources
+IDI_ICON_CEMENT         ICON                    "icon1.ico"
+
+MAINICON                ICON                    "icon1.ico"
+
+#endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

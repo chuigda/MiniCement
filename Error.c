@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "error.h"
 
 #include <stdarg.h>
@@ -14,22 +16,22 @@ SourceInfo __cdecl CreateSourceInfo(LPCSTR lpszSrcFile, USHORT nLine, USHORT nCo
 }
 
 LPERROR __cdecl CreateErrorBuffer(USHORT nBufferSize) {
-	LPERROR lpErrRet = (LPERROR)HeapAlloc(GetProcessHeap(),
+    LPERROR lpErrRet = (LPERROR)HeapAlloc(GetProcessHeap(),
                                           HEAP_ZERO_MEMORY,
                                           sizeof(Error) + nBufferSize);
-	if (!lpErrRet) {
+    if (!lpErrRet) {
         return NULL;
-	}
-	lpErrRet->nBufferSize = nBufferSize;
-	return lpErrRet;
+    }
+    lpErrRet->nBufferSize = nBufferSize;
+    return lpErrRet;
 }
 
 void __cdecl DropError(LPERROR lpErr) {
-	HeapFree(GetProcessHeap(), 0, (LPVOID)lpErr);
+    HeapFree(GetProcessHeap(), 0, (LPVOID)lpErr);
 }
 
 BOOL __cdecl IsError(LPCERROR lpErr) {
-	return !lpErr->nErrCode;
+    return !lpErr->nErrCode;
 }
 
 void __cdecl FormatError(LPERROR lpErrDest,
@@ -37,12 +39,12 @@ void __cdecl FormatError(LPERROR lpErrDest,
                          USHORT nErrCode,
                          LPCSTR fmt,
                          ...) {
-	va_list va;
+    va_list va;
 
-	lpErrDest->srcInfo = srcInfo;
-	lpErrDest->nErrCode = nErrCode;
+    lpErrDest->srcInfo = srcInfo;
+    lpErrDest->nErrCode = nErrCode;
 
-	va_start(va, fmt);
-	vsprintf((LPSTR const)lpErrDest->szBuffer, fmt, va);
-	va_end(va);
+    va_start(va, fmt);
+    vsprintf((LPSTR const)lpErrDest->szBuffer, fmt, va);
+    va_end(va);
 }

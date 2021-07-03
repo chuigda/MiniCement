@@ -1,4 +1,7 @@
-
+//{{NO_DEPENDENCIES}}
+// Microsoft Visual C++ 生成的包含文件。
+// 供 Main.rc 使用
+//
 #define IDR_MAIN_MENU                   101
 #define IDD_PACK_DIALOG                 101
 #define IDD_ONLINE_PKGS_DIALOG          102

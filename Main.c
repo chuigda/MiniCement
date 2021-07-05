@@ -11,8 +11,8 @@
 #include "resource.h"
 
 static const LPCSTR WarnText = 
-"×¢Òâ£º±¾³ÌÐòÊÇ¹¤³ÌÑùÆ·£¡\r\n"
-"±¾³ÌÐòµÄ¹¦ÄÜ¿ÉÄÜ²»ÎÈ¶¨£¬Çë½÷É÷Ê¹ÓÃ\r\n";
+"æ³¨æ„ï¼šæœ¬ç¨‹åºæ˜¯å·¥ç¨‹æ ·å“ï¼\r\n"
+"æœ¬ç¨‹åºçš„åŠŸèƒ½å¯èƒ½ä¸ç¨³å®šï¼Œè¯·è°¨æ…Žä½¿ç”¨\r\n";
 
 static const LPCSTR MainWindowClassName = "MainWindowClassName_79431242";
 
@@ -75,7 +75,7 @@ int main(int argc, const char *argv[]) {
 
     if (!bHeadless) {
         FreeConsole();
-        MessageBox(NULL, WarnText, "¾¯¸æ", MB_ICONWARNING);
+        MessageBox(NULL, WarnText, "è­¦å‘Š", MB_ICONWARNING);
     } else {
         fprintf(stderr, "%s\r\n", WarnText);
     }
@@ -83,13 +83,13 @@ int main(int argc, const char *argv[]) {
     globalContext.hInstance = GetModuleHandle(NULL);
     globalContext.hHeap = GetProcessHeap();
     if (!globalContext.hInstance) {
-        MessageBox(NULL, "ÎÞ·¨»ñÈ¡Ó¦ÓÃ³ÌÐòÊµÀý", "´íÎó", MB_ICONSTOP);
+        MessageBox(NULL, "æ— æ³•èŽ·å–åº”ç”¨ç¨‹åºå®žä¾‹", "é”™è¯¯", MB_ICONSTOP);
         return -1;
     }
 
     hMenu = LoadMenu(globalContext.hInstance, MAKEINTRESOURCE(IDR_MAIN_MENU));
     if (!hMenu) {
-        MessageBox(NULL, "ÎÞ·¨³õÊ¼»¯³ÌÐò²Ëµ¥", "´íÎó", MB_ICONSTOP);
+        MessageBox(NULL, "æ— æ³•åˆå§‹åŒ–ç¨‹åºèœå•", "é”™è¯¯", MB_ICONSTOP);
         return -1;
     }
 
@@ -99,13 +99,13 @@ int main(int argc, const char *argv[]) {
                        OUT_CHARACTER_PRECIS, CLIP_CHARACTER_PRECIS, PROOF_QUALITY, DEFAULT_PITCH,
                        "SimSun");
     if (!hFont) {
-        MessageBox(NULL, "ÎÞ·¨³õÊ¼»¯±à¼­Æ÷×ÖÌå", "´íÎó", MB_ICONSTOP);
+        MessageBox(NULL, "æ— æ³•åˆå§‹åŒ–ç¼–è¾‘å™¨å­—ä½“", "é”™è¯¯", MB_ICONSTOP);
         return -1;
     }
 
     hIcon = LoadIcon(globalContext.hInstance, MAKEINTRESOURCE(IDI_ICON_CEMENT));
     if (!hIcon) {
-        MessageBox(NULL, "ÎÞ·¨³õÊ¼»¯³ÌÐòÍ¼±ê×ÊÔ´", "´íÎó", MB_ICONSTOP);
+        MessageBox(NULL, "æ— æ³•åˆå§‹åŒ–ç¨‹åºå›¾æ ‡èµ„æº", "é”™è¯¯", MB_ICONSTOP);
         return -1;
     }
 
@@ -120,7 +120,7 @@ int main(int argc, const char *argv[]) {
     wndClass.lpszMenuName = MAKEINTRESOURCE(IDR_MAIN_MENU);
     wndClass.lpszClassName = MainWindowClassName;
     if (!RegisterClass(&wndClass)) {
-        MessageBox(NULL, "×¢²á´°¿ÚÀàÊ§°Ü", "´íÎó", MB_ICONSTOP);
+        MessageBox(NULL, "æ³¨å†Œçª—å£ç±»å¤±è´¥", "é”™è¯¯", MB_ICONSTOP);
         return -1;
     }
 
@@ -131,13 +131,13 @@ int main(int argc, const char *argv[]) {
                         CW_USEDEFAULT, CW_USEDEFAULT, 640, 480,
                         NULL, hMenu, globalContext.hInstance, &mainWindowInit);
     if (!hWnd) {
-        MessageBox(NULL, "ÎÞ·¨³õÊ¼»¯³ÌÐò´°¿Ú", "´íÎó", MB_ICONSTOP);
+        MessageBox(NULL, "æ— æ³•åˆå§‹åŒ–ç¨‹åºçª—å£", "é”™è¯¯", MB_ICONSTOP);
         return -1;
     }
 
     ShowWindow(hWnd, SW_SHOW);
     
-    while (GetMessage(&msg, hWnd, 0, 0) > 0) {
+    while (GetMessage(&msg, NULL, 0, 0) > 0) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
@@ -161,7 +161,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd,
 
         lpMainWindowData = (LPMWDATA)HeapAlloc(lpMainWindowInit->globalContext.hHeap, HEAP_ZERO_MEMORY, sizeof(MainWindowData));
         if (!lpMainWindowData) {
-            MessageBox(NULL, "ÎÞ·¨³õÊ¼»¯³ÌÐò´°¿Ú", "´íÎó", MB_ICONSTOP);
+            MessageBox(NULL, "æ— æ³•åˆå§‹åŒ–ç¨‹åºçª—å£", "é”™è¯¯", MB_ICONSTOP);
             PostQuitMessage(-1);
             break;
         }
@@ -177,7 +177,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd,
         GetClientRect(hWnd, &rect);
         lpMainWindowData->hWndEdit = CreateCodeEditControl(hWnd, 0, 0, rect.right, rect.bottom);
         if (!lpMainWindowData->hWndEdit) {
-            MessageBox(NULL, "ÎÞ·¨³õÊ¼»¯³ÌÐò´°¿Ú", "´íÎó", MB_ICONSTOP);
+            MessageBox(NULL, "æ— æ³•åˆå§‹åŒ–ç¨‹åºçª—å£", "é”™è¯¯", MB_ICONSTOP);
             PostQuitMessage(-1);
             break;
         }
@@ -198,7 +198,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd,
 
             bModified = (BOOL)SendMessage(lpMainWindowData->hWndEdit, EM_GETMODIFY, 0, 0);
             if (bModified) {
-                iChoice = MessageBox(hWnd, "ÓÐÎ´±£´æµÄ¸Ä¶¯£¬È·¶¨¼ÌÐøÂð", "¾¯¸æ", MB_OKCANCEL | MB_ICONWARNING);
+                iChoice = MessageBox(hWnd, "æœ‰æœªä¿å­˜çš„æ”¹åŠ¨ï¼Œç¡®å®šç»§ç»­å—", "è­¦å‘Š", MB_OKCANCEL | MB_ICONWARNING);
             }
 
             if (!bModified || iChoice == IDOK) {
@@ -220,7 +220,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd,
 
             bModified = (BOOL)SendMessage(lpMainWindowData->hWndEdit, EM_GETMODIFY, 0, 0);
             if (bModified) {
-                iChoice = MessageBox(hWnd, "ÓÐÎ´±£´æµÄ¸Ä¶¯£¬È·¶¨¼ÌÐøÂð", "¾¯¸æ", MB_OKCANCEL | MB_ICONWARNING);
+                iChoice = MessageBox(hWnd, "æœ‰æœªä¿å­˜çš„æ”¹åŠ¨ï¼Œç¡®å®šç»§ç»­å—", "è­¦å‘Š", MB_OKCANCEL | MB_ICONWARNING);
             }
 
             if (!bModified || iChoice == IDOK) {
@@ -231,7 +231,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd,
 
                 bSuccess = ReadFileToString(lpMainWindowData->openFileName.lpstrFile, &lpszFileContent);
                 if (!bSuccess) {
-                    MessageBox(hWnd, "ÎÞ·¨´ò¿ªÖ¸¶¨µÄÎÄ¼þ", "´íÎó", MB_ICONSTOP);
+                    MessageBox(hWnd, "æ— æ³•æ‰“å¼€æŒ‡å®šçš„æ–‡ä»¶", "é”™è¯¯", MB_ICONSTOP);
                     break;
                 }
 
@@ -255,7 +255,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd,
             iTextLength = GetWindowTextLength(lpMainWindowData->hWndEdit);
             lpszBuffer = HeapAlloc(lpMainWindowData->globalContext.hHeap, HEAP_ZERO_MEMORY, iTextLength + 1);
             if (!lpszBuffer) {
-                MessageBox(hWnd, "ÎÞ·¨±£´æÎÄ¼þ", "´íÎó", MB_ICONSTOP);
+                MessageBox(hWnd, "æ— æ³•ä¿å­˜æ–‡ä»¶", "é”™è¯¯", MB_ICONSTOP);
                 break;
             }
             GetWindowText(lpMainWindowData->hWndEdit, lpszBuffer, iTextLength + 1);
@@ -273,7 +273,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd,
 
             bSuccess = WriteStringToFile(lpMainWindowData->lpszEditFileName, lpszBuffer);
             if (!bSuccess) {
-                MessageBox(hWnd, "ÎÞ·¨±£´æµ½Ö¸¶¨µÄÎÄ¼þ", "´íÎó", MB_ICONSTOP);
+                MessageBox(hWnd, "æ— æ³•ä¿å­˜åˆ°æŒ‡å®šçš„æ–‡ä»¶", "é”™è¯¯", MB_ICONSTOP);
                 if (bCreateFile) {
                     HeapFree(lpMainWindowData->globalContext.hHeap, 0, lpMainWindowData->lpszEditFileName);
                     lpMainWindowData->lpszEditFileName = NULL;
@@ -294,7 +294,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd,
             iTextLength = GetWindowTextLength(lpMainWindowData->hWndEdit);
             lpszBuffer = HeapAlloc(lpMainWindowData->globalContext.hHeap, HEAP_ZERO_MEMORY, iTextLength + 1);
             if (!lpszBuffer) {
-                MessageBox(hWnd, "ÎÞ·¨±£´æÎÄ¼þ", "´íÎó", MB_ICONSTOP);
+                MessageBox(hWnd, "æ— æ³•ä¿å­˜æ–‡ä»¶", "é”™è¯¯", MB_ICONSTOP);
                 break;
             }
             GetWindowText(lpMainWindowData->hWndEdit, lpszBuffer, iTextLength + 1);
@@ -307,7 +307,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd,
             lpszFileName = StringCopy(lpMainWindowData->openFileName.lpstrFile);
             bSuccess = WriteStringToFile(lpszFileName, lpszBuffer);
             if (!bSuccess) {
-                MessageBox(hWnd, "ÎÞ·¨±£´æµ½Ö¸¶¨µÄÎÄ¼þ", "´íÎó", MB_ICONSTOP);
+                MessageBox(hWnd, "æ— æ³•ä¿å­˜åˆ°æŒ‡å®šçš„æ–‡ä»¶", "é”™è¯¯", MB_ICONSTOP);
                 HeapFree(lpMainWindowData->globalContext.hHeap, 0, lpszFileName);
             } else {
                 if (lpMainWindowData->lpszEditFileName != NULL) {
@@ -336,7 +336,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd,
 
         bModified = (BOOL)SendMessage(lpMainWindowData->hWndEdit, EM_GETMODIFY, 0, 0);
         if (bModified) {
-            iChoice = MessageBox(hWnd, "ÓÐÎ´±£´æµÄ¸Ä¶¯£¬È·¶¨¼ÌÐøÂð", "¾¯¸æ", MB_OKCANCEL | MB_ICONWARNING);
+            iChoice = MessageBox(hWnd, "æœ‰æœªä¿å­˜çš„æ”¹åŠ¨ï¼Œç¡®å®šç»§ç»­å—", "è­¦å‘Š", MB_OKCANCEL | MB_ICONWARNING);
         }
 
         if (!bModified || iChoice == IDOK) {

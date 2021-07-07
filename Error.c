@@ -1,6 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-#include "error.h"
+#include "Error.h"
 
 #include <stdarg.h>
 #include <stdio.h>

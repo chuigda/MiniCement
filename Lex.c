@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <windows.h>
 
 #include "Lex.h"
 #include "Util.h"
